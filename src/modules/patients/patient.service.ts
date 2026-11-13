@@ -1,7 +1,12 @@
 import { Types } from 'mongoose';
 import { ApiError } from '../../utils/ApiError.js';
 import { buildPaginationMeta } from '../../utils/response.js';
-import { buildDateRangeFilter, buildSearchFilter, buildSort } from '../../utils/query.js';
+import {
+  buildDateRangeFilter,
+  buildInFilter,
+  buildSearchFilter,
+  buildSort,
+} from '../../utils/query.js';
 import { assertDoctorExists } from '../doctors/doctor.service.js';
 import { Patient } from './patient.model.js';
 import type {
@@ -19,8 +24,8 @@ export async function listPatients(query: ListPatientsQuery) {
 
   const filter = {
     ...(doctor && { doctor: new Types.ObjectId(doctor) }),
-    ...(condition && { condition }),
-    ...(gender && { gender }),
+    ...buildInFilter('condition', condition),
+    ...buildInFilter('gender', gender),
     ...buildDateRangeFilter(from, to),
     ...buildSearchFilter(search, ['name', 'phone', 'email', 'condition']),
   };

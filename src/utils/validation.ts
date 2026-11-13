@@ -57,6 +57,28 @@ export const validDateRange: [
   { message: '"from" must be on or before "to"', path: ['from'] },
 ];
 
+/**
+ * Multi-value filter from a comma-separated query param: `?gender=male,female`.
+ * Empty → undefined (no filter). Capped at 20 values.
+ */
+export const csvListSchema = <T extends z.ZodType<string, string>>(item: T) =>
+  z
+    .string()
+    .optional()
+    .transform((value) =>
+      value
+        ? [
+            ...new Set(
+              value
+                .split(',')
+                .map((part) => part.trim())
+                .filter(Boolean),
+            ),
+          ]
+        : undefined,
+    )
+    .pipe(z.array(item).max(20, 'Too many filter values').optional());
+
 /** Optional text field for updates: empty string means "clear this value" (null). */
 export const clearableString = (max: number) =>
   z

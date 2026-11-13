@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { GENDERS } from '../../constants/domain.js';
 import {
   clearableString,
+  csvListSchema,
   emailSchema,
   listQueryShape,
   nameSchema,
@@ -25,7 +26,13 @@ const dateOfBirthSchema = z.coerce
 const conditionSchema = z
   .string({ error: 'Medical condition is required' })
   .transform((value) => value.trim().replace(/\s+/g, ' '))
-  .pipe(z.string().min(2, 'Medical condition is required').max(100))
+  .pipe(
+    z
+      .string()
+      .min(2, 'Medical condition is required')
+      .max(100)
+      .refine((value) => !value.includes(','), 'Enter a single primary condition (no commas)'),
+  )
   .transform((value) => value.charAt(0).toUpperCase() + value.slice(1));
 
 const optionalEmailSchema = z
@@ -72,8 +79,8 @@ export const updatePatientSchema = z
 export const listPatientsQuerySchema = z
   .object({
     ...listQueryShape,
-    condition: z.string().trim().max(100).optional(),
-    gender: z.enum(GENDERS).optional(),
+    condition: csvListSchema(z.string().max(100)),
+    gender: csvListSchema(z.enum(GENDERS)),
     doctor: objectIdSchema.optional(),
   })
   .refine(...validDateRange);

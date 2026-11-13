@@ -1,7 +1,12 @@
 import { Types, type PipelineStage } from 'mongoose';
 import { ApiError } from '../../utils/ApiError.js';
 import { buildPaginationMeta } from '../../utils/response.js';
-import { buildDateRangeFilter, buildSearchFilter, buildSort } from '../../utils/query.js';
+import {
+  buildDateRangeFilter,
+  buildInFilter,
+  buildSearchFilter,
+  buildSort,
+} from '../../utils/query.js';
 import { Patient } from '../patients/patient.model.js';
 import { Doctor } from './doctor.model.js';
 import type { CreateDoctorInput, ListDoctorsQuery, UpdateDoctorInput } from './doctor.schema.js';
@@ -29,8 +34,8 @@ export async function listDoctors(query: ListDoctorsQuery) {
   const { page, limit, search, specialization, hospital, from, to, sort } = query;
 
   const filter = {
-    ...(specialization && { specialization }),
-    ...(hospital && { hospital }),
+    ...buildInFilter('specialization', specialization),
+    ...buildInFilter('hospital', hospital),
     ...buildDateRangeFilter(from, to),
     ...buildSearchFilter(search, ['name', 'email', 'phone', 'hospital']),
   };

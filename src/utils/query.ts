@@ -28,6 +28,15 @@ export function buildDateRangeFilter(from?: Date, to?: Date) {
   };
 }
 
+/**
+ * Equality or `$in` filter for multi-select facets. `$in` is wrapped in `mongoose.trusted()`
+ * because sanitizeFilter would otherwise neutralise it; values are already Zod-validated.
+ */
+export function buildInFilter(field: string, values: string[] | undefined) {
+  if (!values?.length) return {};
+  return { [field]: values.length === 1 ? values[0] : mongoose.trusted({ $in: values }) };
+}
+
 /** Stable sort: `_id` is always the tiebreaker so pages never overlap or skip records. */
 export function buildSort(sort: SortOption): Record<string, 1 | -1> {
   switch (sort) {

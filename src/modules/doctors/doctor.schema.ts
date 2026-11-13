@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { SPECIALIZATIONS } from '../../constants/domain.js';
 import {
+  csvListSchema,
   emailSchema,
   listQueryShape,
   nameSchema,
@@ -30,8 +31,8 @@ export const updateDoctorSchema = z
 export const listDoctorsQuerySchema = z
   .object({
     ...listQueryShape,
-    specialization: z.enum(SPECIALIZATIONS).optional(),
-    hospital: z.string().trim().max(150).optional(),
+    specialization: csvListSchema(z.enum(SPECIALIZATIONS)),
+    hospital: csvListSchema(z.string().max(150)),
   })
   .refine(...validDateRange);
 
