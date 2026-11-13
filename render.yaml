@@ -1,0 +1,29 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: doctor-tracker-api
+    runtime: node
+    plan: free
+    region: singapore
+    # devDependencies (TypeScript) are needed to build even though NODE_ENV=production
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: MONGODB_URI
+        sync: false # set in the Render dashboard — never committed
+      - key: MONGODB_DB_NAME
+        value: doctor-tracker
+      - key: JWT_SECRET
+        generateValue: true # Render generates a strong random secret
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      - key: CORS_ORIGINS
+        sync: false # the Vercel frontend URL, e.g. https://doctor-tracker-web.vercel.app
+      - key: TRUST_PROXY_HOPS
+        value: "2" # Vercel rewrite → Render proxy → app
