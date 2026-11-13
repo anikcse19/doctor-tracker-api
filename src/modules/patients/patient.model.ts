@@ -17,8 +17,8 @@ const patientSchema = new Schema(
 );
 
 // Each index maps to a real query in patient.service / doctor.service / dashboard.service.
-patientSchema.index({ doctor: 1, createdAt: -1 }); // doctor's patient list + per-doctor counts ($lookup)
-patientSchema.index({ condition: 1, createdAt: -1 }); // condition filter + distinct('condition')
+patientSchema.index({ doctor: 1, createdAt: -1, _id: -1 }); // doctor's patient list + per-doctor counts ($lookup)
+patientSchema.index({ condition: 1, createdAt: -1, _id: -1 }); // condition filter + distinct('condition')
 patientSchema.index({ createdAt: -1, _id: -1 }); // default sort, date-range filter, trend analytics
 patientSchema.index({ name: 1 }); // alphabetical sort
 

@@ -6,6 +6,7 @@
  * Data is deterministic (fixed faker seed) and spread over the last ~6 months so the
  * dashboard trends are meaningful. All analytics are computed from these real documents.
  */
+import '../src/config/dns.js';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import { faker } from '@faker-js/faker';
@@ -177,7 +178,9 @@ async function main() {
   if (SEED_ADMIN_PASSWORD.length < 8) throw new Error('SEED_ADMIN_PASSWORD must be ≥ 8 chars');
 
   faker.seed(20261113);
-  await mongoose.connect(MONGODB_URI);
+  await mongoose.connect(MONGODB_URI, {
+    dbName: process.env.MONGODB_DB_NAME || 'doctor-tracker',
+  });
   console.warn(`Connected to "${mongoose.connection.name}"`);
 
   await Promise.all([Admin.syncIndexes(), Doctor.syncIndexes(), Patient.syncIndexes()]);

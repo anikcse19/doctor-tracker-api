@@ -22,7 +22,7 @@ const doctorSchema = new Schema(
 // Each index maps to a real query in doctor.service / dashboard.service.
 // `email` unique index is declared on the field above.
 doctorSchema.index({ createdAt: -1, _id: -1 }); // default list sort + creation-date range filter
-doctorSchema.index({ specialization: 1, createdAt: -1 }); // specialization filter, newest first
+doctorSchema.index({ specialization: 1, createdAt: -1, _id: -1 }); // specialization filter, newest first
 doctorSchema.index({ name: 1 }); // alphabetical sort + /doctors/options
 doctorSchema.index({ hospital: 1 }); // hospital filter + distinct('hospital')
 

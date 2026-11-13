@@ -1,3 +1,4 @@
+import './dns.js';
 import mongoose from 'mongoose';
 import { env, isProduction } from './env.js';
 import { logger } from './logger.js';
@@ -13,6 +14,7 @@ export async function connectDatabase(): Promise<void> {
   mongoose.connection.on('reconnected', () => logger.info('MongoDB reconnected'));
 
   await mongoose.connect(env.MONGODB_URI, {
+    dbName: env.MONGODB_DB_NAME,
     serverSelectionTimeoutMS: 10_000,
     maxPoolSize: 10,
     // Build indexes automatically in development; in production they are synced explicitly
