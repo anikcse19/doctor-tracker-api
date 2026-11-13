@@ -11,7 +11,7 @@
 
 > Hosted on Render's free tier — the service sleeps after 15 minutes idle, so the first request may take ~50 s.
 
-![Dashboard](https://raw.githubusercontent.com/anikcse19/doctor-tracker-web/main/docs/screenshots/dashboard.png)
+![Dashboard](https://raw.githubusercontent.com/anikcse19/doctor-tracker-web/main/docs/screenshots/dashboard.webp)
 
 ---
 
@@ -197,7 +197,7 @@ Base URL: `/api/v1` · All routes except `/health` and `/auth/login|logout` requ
 
 | Method | Path | Description |
 |---|---|---|
-| GET | `/doctors` | List. Query: `search`, `specialization`, `hospital`, `from`, `to`, `sort` (`newest`·`oldest`·`name_asc`·`name_desc`), `page`, `limit`. Each item includes `patientCount` |
+| GET | `/doctors` | List. Query: `search`, `specialization`*, `hospital`*, `from`, `to`, `sort` (`newest`·`oldest`·`name_asc`·`name_desc`), `page`, `limit`. Each item includes `patientCount` |
 | POST | `/doctors` | Create `{ name, specialization, hospital, phone, email }` → 201 · 409 on duplicate email |
 | GET | `/doctors/options` | `{ _id, name, specialization }[]` for select inputs |
 | GET | `/doctors/hospitals` | Distinct hospital names (filter options) |
@@ -211,11 +211,13 @@ Base URL: `/api/v1` · All routes except `/health` and `/auth/login|logout` requ
 
 | Method | Path | Description |
 |---|---|---|
-| GET | `/patients` | List. Query: `search`, `condition`, `gender`, `doctor`, `from`, `to`, `sort`, `page`, `limit`. Each item embeds `doctor { _id, name, specialization, hospital }` |
+| GET | `/patients` | List. Query: `search`, `condition`*, `gender`*, `doctor`, `from`, `to`, `sort`, `page`, `limit`. Each item embeds `doctor { _id, name, specialization, hospital }` |
 | GET | `/patients/conditions` | Distinct conditions (filter options) |
 | GET | `/patients/:id` | Full record incl. notes and doctor contact |
 | PATCH | `/patients/:id` | Partial update; `doctor` reassigns (validated to exist); `""` clears `email`/`notes` |
 | DELETE | `/patients/:id` | → 204 |
+
+* **Multi-value filters** accept a comma-separated list (`?specialization=Cardiology,ENT`, `?gender=male,other`) and become an `$in` query (still index-served; `$in` is wrapped in `mongoose.trusted()` so `sanitizeFilter` stays on for user input). Values are de-duplicated, validated per item (enums stay enums) and capped at 20. Because of this, a patient's primary condition may not contain a comma.
 
 ### Dashboard
 
@@ -229,7 +231,7 @@ Example:
 curl -c cookies.txt -H 'Content-Type: application/json' \
   -d '{"email":"admin@doctortracker.app","password":"CareGuide@2026"}' \
   https://doctor-tracker-api-54fy.onrender.com/api/v1/auth/login
-curl -b cookies.txt 'https://doctor-tracker-api-54fy.onrender.com/api/v1/patients?condition=Asthma&gender=female&page=1&limit=5'
+curl -b cookies.txt 'https://doctor-tracker-api-54fy.onrender.com/api/v1/patients?condition=Asthma,COPD&gender=female&page=1&limit=5'
 ```
 
 ---
@@ -308,11 +310,11 @@ Screenshots from the live deployment (more in the [frontend README](https://gith
 
 | Doctor profile & patient list | Patients filtered by condition |
 |---|---|
-| ![Doctor](https://raw.githubusercontent.com/anikcse19/doctor-tracker-web/main/docs/screenshots/doctor-detail.png) | ![Patients](https://raw.githubusercontent.com/anikcse19/doctor-tracker-web/main/docs/screenshots/patients-filtered.png) |
+| ![Doctor](https://raw.githubusercontent.com/anikcse19/doctor-tracker-web/main/docs/screenshots/doctor-detail.webp) | ![Patients](https://raw.githubusercontent.com/anikcse19/doctor-tracker-web/main/docs/screenshots/patients-filtered.webp) |
 
 | Mobile dashboard | Mobile patients |
 |---|---|
-| ![Mobile dashboard](https://raw.githubusercontent.com/anikcse19/doctor-tracker-web/main/docs/screenshots/mobile-dashboard.png) | ![Mobile patients](https://raw.githubusercontent.com/anikcse19/doctor-tracker-web/main/docs/screenshots/mobile-patients.png) |
+| ![Mobile dashboard](https://raw.githubusercontent.com/anikcse19/doctor-tracker-web/main/docs/screenshots/mobile-dashboard.webp) | ![Mobile patients](https://raw.githubusercontent.com/anikcse19/doctor-tracker-web/main/docs/screenshots/mobile-patients.webp) |
 
 ---
 
