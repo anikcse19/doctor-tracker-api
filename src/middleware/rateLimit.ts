@@ -16,13 +16,13 @@ export const apiRateLimiter = rateLimit({
 });
 
 /**
- * Brute-force protection for login. Keyed by IP + email so that, behind a shared proxy
- * (e.g. Vercel rewrites), one attacker hammering an account cannot lock out every user.
- * Only failed attempts count.
+ * Brute-force protection for login, keyed by client IP + email; only failed attempts count.
+ * Correct client IPs depend on TRUST_PROXY_HOPS — otherwise every user behind the Vercel
+ * rewrite would share one IP and a single attacker could lock everyone out.
  */
 export const loginRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 5,
+  limit: 10,
   skipSuccessfulRequests: true,
   standardHeaders: 'draft-8',
   legacyHeaders: false,

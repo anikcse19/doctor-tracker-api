@@ -13,9 +13,9 @@ import { apiRouter } from './routes.js';
 export function createApp() {
   const app = express();
 
-  // Behind Render's (and Vercel's) proxies: trust the first hop so req.ip and
-  // `secure` cookies work correctly.
-  app.set('trust proxy', 1);
+  // Trust exactly the known proxy hops (Render, plus Vercel's rewrite in production) so
+  // req.ip is the real client — required for per-client rate limiting to be meaningful.
+  app.set('trust proxy', env.TRUST_PROXY_HOPS);
   app.disable('x-powered-by');
 
   app.use(helmet());

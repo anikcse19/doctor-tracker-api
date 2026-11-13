@@ -24,6 +24,9 @@ const envSchema = z.object({
         .map((origin) => origin.trim())
         .filter(Boolean),
     ),
+  // Number of reverse proxies in front of the API. 1 = Render only (direct calls);
+  // 2 = Vercel rewrite → Render, so req.ip is the real browser IP, not Vercel's.
+  TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(1),
 });
 
 const parsed = envSchema.safeParse(process.env);
